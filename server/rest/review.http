@@ -1,0 +1,37 @@
+@token = token
+@host = localhost:4005
+
+// Submit a user review
+POST http://{{host}}/api/v1/review HTTP/1.1
+content-type: application/json
+auth-token: {{token}}
+
+{
+  "review": "First review",
+  "star": "1",
+  "recommendation" :"down"
+}
+
+###
+
+// Edit a user review
+PUT http://{{host}}/api/v1/review HTTP/1.1
+content-type: application/json
+auth-token: {{token}}
+
+{
+  "review": "Second Review",
+  "star": "5",
+  "recommendation" :"up"
+}
+
+###
+
+// Delete a user review
+DELETE http://{{host}}/api/v1/review HTTP/1.1
+content-type: application/json
+auth-token: {{token}}
+
+###
+
+

@@ -1,0 +1,6 @@
+@host = localhost:4005
+
+GET http://{{host}}/api/v1/health HTTP/1.1
+content-type: application/json
+
+###

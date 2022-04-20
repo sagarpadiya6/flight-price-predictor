@@ -1,0 +1,69 @@
+@token = token
+@host = localhost:4005
+
+// Register new user
+POST http://{{host}}/api/v1/user/register HTTP/1.1
+content-type: application/json
+
+{
+  "name": "Sagar Padiya",
+  "username": "sagarpadiya",
+  "email": "vignesh6993@live.in",
+  "password": "Sagar#123",
+  "repeat_password": "Sagar#123"
+}
+
+###
+
+// Resend confirmation email when user remembers email
+POST http://{{host}}/api/v1/user/resend-email HTTP/1.1
+content-type: application/json
+
+{
+  "emailOrUsername": "vignesh6993@live.in"
+}
+###
+
+// Resend confirmation email when user remembers username
+POST http://{{host}}/api/v1/user/resend-email HTTP/1.1
+content-type: application/json
+
+{
+  "emailOrUsername": "sagarpadiya"
+}
+
+
+###
+
+// Login using username and password
+POST http://{{host}}/api/v1/user/login HTTP/1.1
+content-type: application/json
+
+{
+  "emailOrUsername": "sagarpadiya",
+  "password": "Sagar#123"
+}
+
+###
+
+// Login using email and password
+POST http://{{host}}/api/v1/user/login HTTP/1.1
+content-type: application/json
+
+{
+  "emailOrUsername": "vignesh6993@live.in",
+  "password": "Sagar#123"
+}
+
+###
+
+GET http://{{host}}/api/v1/user/confirmation/:token HTTP/1.1
+content-type: application/json
+
+###
+
+DELETE http://{{host}}/api/v1/user/:id HTTP/1.1
+content-type: application/json
+auth-token: {{token}}
+
+###
