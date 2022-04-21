@@ -18,4 +18,5 @@ stop_db:
 migrate:
 	@echo "Running migrations"
 	@sequelize db:migrate
+	@sequelize db:seed:all
 	@echo "Migrations done"
