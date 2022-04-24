@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
+import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useTheme } from "@mui/material/styles";
-import { useForm } from "react-hook-form";
 import Container from "@mui/material/Container";
 import useAuth from "../../hooks/useAuth";
 import { loginUser } from "../../api";
@@ -55,6 +55,17 @@ export default function SignIn({ redirectFromSignUp = false }) {
   const avatarStyle = {
     backgroundColor: theme.palette.primary.main,
   };
+
+  useEffect(() => {
+    if (data?.id) {
+      setAuth({
+        id: data?.id,
+        role: data?.role,
+        token: data?.token,
+      });
+      navigate(from, { replace: true });
+    }
+  }, [data]);
 
   return (
     <Container component="main" maxWidth="sm">
@@ -140,8 +151,8 @@ export default function SignIn({ redirectFromSignUp = false }) {
               />
             </Box>
             <Box mt={4}>
-              <Button
-                isLoading={isLoading}
+              <LoadingButton
+                loading={Boolean(isLoading)}
                 type="submit"
                 variant="contained"
                 size="large"
@@ -149,7 +160,7 @@ export default function SignIn({ redirectFromSignUp = false }) {
                 fullWidth
               >
                 <Typography variant="h6">Sign In</Typography>
-              </Button>
+              </LoadingButton>
             </Box>
           </form>
         </Grid>

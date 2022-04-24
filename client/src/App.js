@@ -21,9 +21,11 @@ function App() {
         <Route exact path="unauthorized" element={<UnAuthorized />} />
 
         {/* private routes */}
-        <Route element={<RequireAuth />}>
+        <Route element={<RequireAuth allowedRoles={["user", "admin"]} />}>
           <Route exact path="reviews" element={<Reviews />} />
           <Route exact path="pricing" element={<Pricing />} />
+        </Route>
+        <Route element={<RequireAuth allowedRoles={["admin"]} />}>
           <Route exact path="admin" element={<Admin />} />
         </Route>
 

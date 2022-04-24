@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -17,17 +18,21 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../../ToggleColorMode";
 import { NavLink as Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import { logOutUser } from "../../api";
 
-const pages = [
-  {
-    name: "Pricing",
-    link: "/pricing",
-  },
-  { name: "Reviews", link: "/reviews" },
-];
 const settings = ["Account", "Logout"];
 
 const ResponsiveAppBar = () => {
+  const [pages, setPages] = useState([
+    {
+      name: "Pricing",
+      link: "/pricing",
+    },
+    { name: "Reviews", link: "/reviews" },
+  ]);
+  const { auth, setAuth } = useAuth();
+  const navigate = useNavigate();
   const theme = useTheme();
   const colorMode = React.useContext(ColorModeContext);
 
@@ -45,9 +50,36 @@ const ResponsiveAppBar = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (event) => {
+    const { menu } = event.currentTarget.dataset;
+    switch (menu) {
+      case "Logout":
+        logOutUser(auth?.token);
+        setAuth(null);
+        navigate("/login", { replace: true });
+        break;
+      default:
+        break;
+    }
     setAnchorElUser(null);
   };
+
+  useEffect(() => {
+    if (
+      auth?.role === "admin" &&
+      !pages.find((page) => page.name === "Admin")
+    ) {
+      setPages([
+        ...pages,
+        {
+          name: "Admin",
+          link: "/admin",
+        },
+      ]);
+    } else {
+      setPages(pages.filter((page) => page.name !== "Admin"));
+    }
+  }, [auth]);
 
   return (
     <AppBar position="static">
@@ -167,87 +199,64 @@ const ResponsiveAppBar = () => {
               <Brightness4Icon />
             )}
           </IconButton>
-          <Button
-            component={Link}
-            to="/login"
-            sx={{ mr: 2 }}
-            variant="contained"
-            color="secondary"
-          >
-            Login
-          </Button>
-          <Button
-            component={Link}
-            to="/signup"
-            variant="contained"
-            color="secondary"
-          >
-            Sign Up
-          </Button>
-          {/* <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box> */}
+          {auth?.id ? (
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting}
+                    data-menu={setting}
+                    onClick={handleCloseUserMenu}
+                  >
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          ) : (
+            <>
+              <Button
+                component={Link}
+                to="/login"
+                sx={{ mr: 2 }}
+                variant="contained"
+                color="secondary"
+              >
+                Login
+              </Button>
+              <Button
+                component={Link}
+                to="/signup"
+                variant="contained"
+                color="secondary"
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
   );
 };
 export default ResponsiveAppBar;
-
-// import React from "react";
-// import {
-//   Nav,
-//   NavLink,
-//   Bars,
-//   NavMenu,
-//   NavBtn,
-//   NavBtnLink,
-// } from "./NavBar.style";
-
-// function NavBar() {
-//   return (
-//     <Nav>
-//       <Bars />
-
-//       <NavMenu>
-//         <NavLink to="/" activeStyle>
-//           Home
-//         </NavLink>
-//         <NavLink to="/reviews" activeStyle>
-//           Reviews
-//         </NavLink>
-//       </NavMenu>
-//       <NavBtn>
-//         <NavBtnLink to="/signin">Sign In</NavBtnLink>
-//       </NavBtn>
-//     </Nav>
-//   );
-// }
-
-// export default NavBar;

@@ -2,6 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:4005/api/v1",
+  withCredentials: true,
 });
 
 export const loginUser = async ({ emailOrUsername, password }) => {
@@ -43,6 +44,57 @@ export const signUpUser = async ({
       {
         headers: {
           "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw Error(error.response.data.message);
+  }
+};
+
+export const logOutUser = async (token) => {
+  try {
+    const { data } = await api.get("/user/logout", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw Error(error.response.data.message);
+  }
+};
+
+export const getPricing = async ({
+  depDateTime,
+  arrDateTime,
+  stops,
+  airline,
+  source,
+  destination,
+  token,
+}) => {
+  try {
+    const { data } = await api.post(
+      "/price",
+      JSON.stringify({
+        depDateTime,
+        arrDateTime,
+        stops,
+        airline,
+        source,
+        destination,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       }

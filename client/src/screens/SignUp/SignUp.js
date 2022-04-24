@@ -8,7 +8,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
@@ -233,8 +233,8 @@ export default function SignUp() {
               />
             </Box>
             <Box mt={4}>
-              <Button
-                isLoading={isLoading}
+              <LoadingButton
+                isLoading={Boolean(isLoading)}
                 type="submit"
                 variant="contained"
                 size="large"
@@ -242,7 +242,7 @@ export default function SignUp() {
                 fullWidth
               >
                 <Typography variant="h6">Sign Up</Typography>
-              </Button>
+              </LoadingButton>
             </Box>
           </form>
         </Grid>
