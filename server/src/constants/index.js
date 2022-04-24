@@ -9,6 +9,7 @@ export const ERROR_CODE = {
   // User error codes
   ERR_USER_NOT_FOUND: 'ERR_USER_NOT_FOUND',
   ERR_USER_NOT_CONFIRMED: 'ERR_USER_NOT_CONFIRMED',
+  ERR_USER_ALREADY_CONFIRMED: 'ERR_USER_ALREADY_CONFIRMED',
   ERR_INVALID_TOKEN: 'ERR_INVALID_TOKEN',
   ERR_TOKEN_NOT_FOUND: 'ERR_TOKEN_NOT_FOUND',
   ERR_USER_NOT_AUTHORIZED: 'ERR_USER_NOT_AUTHORIZED',
@@ -25,6 +26,8 @@ export const ERROR_MESSAGE = {
   // User error messages
   [ERROR_CODE.ERR_USER_NOT_FOUND]: 'The username or email does not exists',
   [ERROR_CODE.ERR_USER_NOT_CONFIRMED]: 'Please confirm your email to login',
+  [ERROR_CODE.ERR_USER_ALREADY_CONFIRMED]:
+    'Your email has already been confirmed',
   [ERROR_CODE.ERR_INVALID_TOKEN]: 'Invalid token',
   [ERROR_CODE.ERR_TOKEN_NOT_FOUND]: 'Access Denied',
   [ERROR_CODE.ERR_USER_NOT_AUTHORIZED]: 'Access Denied',
