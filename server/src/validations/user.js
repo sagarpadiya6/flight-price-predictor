@@ -16,7 +16,7 @@ export const registerValidation = (data) => {
       .email({ minDomainSegments: 2 })
       .required(),
     password: passwordValidator,
-    repeat_password: Joi.ref('password'),
+    repeatPassword: Joi.ref('password'),
   });
   return userValidation.validate(data);
 };
