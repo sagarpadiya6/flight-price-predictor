@@ -1,12 +1,14 @@
-import { errorMsg } from '../constants';
+import { errorMsg, ERROR_CODE } from '../constants';
 import { User } from '../models';
 
 export default function authRole(role) {
   return async (req, res, next) => {
     // Check if user exists
-    const { userUuid: uuid } = req; // This middleware should be used after verifyToken
+
+    const { userUuid: loggedInUser } = req; // This middleware should be used after verifyToken
+
     try {
-      const user = await User.findOne({ where: { uuid } });
+      const user = await User.findOne({ where: { uuid: loggedInUser.id } });
       if (!user) {
         return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
       }
