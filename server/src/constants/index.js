@@ -49,10 +49,11 @@ export const errorMsg = (
   });
 };
 
-export const successMsg = (res, statusCode = 200, message) => {
+export const successMsg = (res, statusCode = 200, message, payload) => {
   return res.status(statusCode).json({
     status: 'OK',
     code: statusCode,
     message,
+    payload,
   });
 };
