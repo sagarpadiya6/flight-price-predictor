@@ -16,6 +16,8 @@ import transporter from '../utils/transporter';
 import { errorMsg, ERROR_CODE, ROLE } from '../constants';
 import authRole from '../auth/authRole';
 
+// TODO: Store and send roles as an array
+
 /**
  * @swagger
  *  tags:
@@ -112,21 +114,23 @@ router.post('/register', validateBody(registerValidation), async (req, res) => {
  *         description: Check your email to confirm your account
  */
 router.post('/resend-email', async (req, res) => {
-  // Check if user exists
-  let user = false;
-  user = await User.findOne({ where: { email: req.body.emailOrUsername } });
-  if (!user) {
-    user = await User.findOne({
-      where: { username: req.body.emailOrUsername },
-    });
-  }
-  if (!user) {
-    return res.status(400).send('The username or email does not exists');
-  }
-
-  // TODO: check if user not confirmed - send 200 response of user confirmed no need to confirm
-
   try {
+    // Check if user exists
+    let user = false;
+    user = await User.findOne({ where: { email: req.body.emailOrUsername } });
+    if (!user) {
+      user = await User.findOne({
+        where: { username: req.body.emailOrUsername },
+      });
+    }
+    if (!user) {
+      return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND, err);
+    }
+
+    if (user.confirmed) {
+      return errorMsg(res, 400, ERROR_CODE.ERR_USER_ALREADY_CONFIRMED);
+    }
+
     // async email
     jwt.sign(
       { id: user.uuid },
@@ -209,44 +213,67 @@ router.post('/login', validateBody(loginValidation), async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     })
-    .json({ token: accessToken });
+    .json({ id: user.uuid, token: accessToken, role: user.role });
 });
 
 router.get('/logout', verifyToken, (req, res) => {
-  res.clearCookie('refresh_token');
-  return res.status(200).send('Logged out successfully');
+  try {
+    res.clearCookie('refresh_token');
+    return res.status(200).json({
+      msg: 'Logged out successfully',
+    });
+  } catch (err) {
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
+  }
 });
 
-// router.post('/refresh-token', verifyToken, async (req, res) => {
-//   const refreshToken = req.cookies.refresh_token;
-//   if (!refreshToken) {
-//     return errorMsg(res, 400, ERROR_CODE.ERR_REFRESH_TOKEN_NOT_FOUND);
-//   }
+router.get('/refresh-token', async (req, res) => {
+  try {
+    const currentRefreshToken = req.cookies.refresh_token;
+    if (!currentRefreshToken) {
+      return errorMsg(res, 400, ERROR_CODE.ERR_REFRESH_TOKEN_NOT_FOUND);
+    }
 
-//   // create and assign token
-//   const accessToken = jwt.sign(
-//     { id: user.uuid, role: user.role },
-//     process.env.ACCESS_TOKEN_SECRET,
-//     {
-//       expiresIn: '5m',
-//     }
-//   );
-//   const refreshToken = jwt.sign(
-//     { id: user.uuid, role: user.role },
-//     process.env.REFRESH_TOKEN_SECRET,
-//     {
-//       expiresIn: '7d',
-//     }
-//   );
+    // verify refresh token
+    const { id: uuid } = jwt.verify(
+      currentRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
 
-//   return res
-//     .header('Authorization', accessToken)
-//     .cookie('refresh_token', refreshToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//     })
-//     .json({ token: accessToken });
-// });
+    // Check if user exists
+    let user = false;
+    user = await User.findOne({ where: { uuid } });
+    if (!user) {
+      return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
+    }
+
+    // create and assign token
+    const accessToken = jwt.sign(
+      { id: user.uuid, role: user.role },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: '5m',
+      }
+    );
+    const refreshToken = jwt.sign(
+      { id: user.uuid, role: user.role },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    return res
+      .header('Authorization', accessToken)
+      .cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      })
+      .json({ id: user.uuid, token: accessToken, role: user.role });
+  } catch (err) {
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
+  }
+});
 
 /**
  * @openapi
@@ -263,8 +290,11 @@ router.get('/confirmation/:token', async (req, res) => {
     const { id } = jwt.verify(req.params.token, process.env.EMAIL_SECRET);
 
     // if user was already confirmed.
+    const user = await User.findOne({ where: { uuid: id } });
+    if (user.confirmed) {
+      return res.redirect('http://localhost:3000/login?confirmed=true');
+    }
 
-    console.log('User: ', id);
     await User.update(
       { confirmed: true },
       {
@@ -273,12 +303,12 @@ router.get('/confirmation/:token', async (req, res) => {
         },
       }
     );
-    return res.status(200).json({
-      message: 'Email confirmed please login',
-    });
-    // return res.redirect('http://localhost:3000/login');
+    // return res.status(200).json({
+    //   message: 'Email confirmed please login',
+    // });
+    return res.redirect('http://localhost:3000/login?confirmed=true');
   } catch (err) {
-    return errorMsg(res, 400, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
   }
 });
 
@@ -299,9 +329,9 @@ router.delete(
   authRole(ROLE.ADMIN),
   async (req, res) => {
     // Check if user exists and delete
-    const { userUuid: uuid } = req;
+    const { userUuid: loggedInUser } = req;
     try {
-      const user = await User.findOne({ where: { uuid } });
+      const user = await User.findOne({ where: { uuid: loggedInUser.id } });
       if (!user) {
         return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
       }
@@ -313,9 +343,10 @@ router.delete(
       if (!validPassword) {
         return errorMsg(res, 400, ERROR_CODE.ERR_WRONG_PASSWORD);
       }
+      await User.destroy({ where: { uuid: req.params.id } });
       return res.status(200).send({ id: user.uuid });
     } catch (err) {
-      return errorMsg(res, 400, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
+      return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
     }
   }
 );

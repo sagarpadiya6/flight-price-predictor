@@ -1,4 +1,6 @@
-@token = token
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNmZjkxNmRlLWY1ODAtNDY1YS1iMzFiLTQyMjU1YzVkOWY0YyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY1MDgyNjUxOCwiZXhwIjoxNjUwODI2ODE4fQ.gX6d8LeYsiIGdnZaV90pnFbh8a5geS3QTFve8tj7UAM
+@refresh_token = rtoken
+@email_token = etoken
 @host = localhost:4005
 
 // Register new user
@@ -9,8 +11,8 @@ content-type: application/json
   "name": "Sagar Padiya",
   "username": "sagarpadiya1",
   "email": "vignesh6993@live.in",
-  "password": "Sagar#123",
-  "repeatPassword": "Sagar#123"
+  "password": "Dragon555",
+  "repeatPassword": "Dragon555"
 }
 
 ###
@@ -40,7 +42,7 @@ POST http://{{host}}/api/v1/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "emailOrUsername": "sagarpadiya1",
+  "emailOrUsername": "sagarpadiya",
   "password": "Sagar#123"
 }
 
@@ -52,18 +54,34 @@ content-type: application/json
 
 {
   "emailOrUsername": "vignesh6993@live.in",
+  "password": "Dragon555"
+}
+###
+
+// Logout user
+GET http://{{host}}/api/v1/user/logout HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+###
+
+GET http://{{host}}/api/v1/user/confirmation/{{email_token}} HTTP/1.1
+content-type: application/json
+
+###
+
+DELETE http://{{host}}/api/v1/user/b24376e4-6b8c-41f7-a61c-55a76ff0730b HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
   "password": "Sagar#123"
 }
 
 ###
 
-GET http://{{host}}/api/v1/user/confirmation/:token HTTP/1.1
+GET http://{{host}}/api/v1/user/refresh-token HTTP/1.1
 content-type: application/json
-
-###
-
-DELETE http://{{host}}/api/v1/user/:id HTTP/1.1
-content-type: application/json
-auth-token: {{token}}
+Authorization: Bearer {{token}}
 
 ###
