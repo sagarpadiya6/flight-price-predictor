@@ -124,6 +124,8 @@ router.post('/resend-email', async (req, res) => {
     return res.status(400).send('The username or email does not exists');
   }
 
+  // TODO: check if user not confirmed - send 200 response of user confirmed no need to confirm
+
   try {
     // async email
     jwt.sign(
@@ -132,10 +134,15 @@ router.post('/resend-email', async (req, res) => {
       { expiresIn: '1d' },
       (_err, emailToken) => {
         const url = `http://localhost:${process.env['PORT']}/api/v1/user/confirmation/${emailToken}`;
+        var content = fs.readFileSync(
+          path.resolve(__dirname, '../templates/confirmEmail.njk'),
+          'utf8'
+        );
+        nunjucks.configure({ autoescape: true });
         transporter.sendMail({
-          to: user.email,
+          to: savedUser.email,
           subject: 'Confirm email',
-          html: `Please click on this link to confirm your email: <a href="${url}" target="_blank>Confirm</a>"`,
+          html: nunjucks.renderString(content, { name: req.body.name, url }),
         });
       }
     );
@@ -181,9 +188,65 @@ router.post('/login', validateBody(loginValidation), async (req, res) => {
   }
 
   // create and assign token
-  const token = jwt.sign({ id: user.uuid }, process.env.TOKEN_SECRET);
-  return res.header('auth-token', token).json({ token });
+  const accessToken = jwt.sign(
+    { id: user.uuid, role: user.role },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: '5m',
+    }
+  );
+  const refreshToken = jwt.sign(
+    { id: user.uuid, role: user.role },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: '7d',
+    }
+  );
+
+  return res
+    .header('Authorization', accessToken)
+    .cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    .json({ token: accessToken });
 });
+
+router.get('/logout', verifyToken, (req, res) => {
+  res.clearCookie('refresh_token');
+  return res.status(200).send('Logged out successfully');
+});
+
+// router.post('/refresh-token', verifyToken, async (req, res) => {
+//   const refreshToken = req.cookies.refresh_token;
+//   if (!refreshToken) {
+//     return errorMsg(res, 400, ERROR_CODE.ERR_REFRESH_TOKEN_NOT_FOUND);
+//   }
+
+//   // create and assign token
+//   const accessToken = jwt.sign(
+//     { id: user.uuid, role: user.role },
+//     process.env.ACCESS_TOKEN_SECRET,
+//     {
+//       expiresIn: '5m',
+//     }
+//   );
+//   const refreshToken = jwt.sign(
+//     { id: user.uuid, role: user.role },
+//     process.env.REFRESH_TOKEN_SECRET,
+//     {
+//       expiresIn: '7d',
+//     }
+//   );
+
+//   return res
+//     .header('Authorization', accessToken)
+//     .cookie('refresh_token', refreshToken, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === 'production',
+//     })
+//     .json({ token: accessToken });
+// });
 
 /**
  * @openapi
@@ -198,6 +261,9 @@ router.post('/login', validateBody(loginValidation), async (req, res) => {
 router.get('/confirmation/:token', async (req, res) => {
   try {
     const { id } = jwt.verify(req.params.token, process.env.EMAIL_SECRET);
+
+    // if user was already confirmed.
+
     console.log('User: ', id);
     await User.update(
       { confirmed: true },
@@ -238,6 +304,14 @@ router.delete(
       const user = await User.findOne({ where: { uuid } });
       if (!user) {
         return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
+      }
+      // Verify the password of the admin
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (!validPassword) {
+        return errorMsg(res, 400, ERROR_CODE.ERR_WRONG_PASSWORD);
       }
       return res.status(200).send({ id: user.uuid });
     } catch (err) {
