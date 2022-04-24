@@ -4,6 +4,10 @@
 
 `make start_db`
 
+Install sequelize CLI globally
+
+`npm i -g sequelize-cli`
+
 `make migrate`
 
 ## To stop the DB run the below command
