@@ -3,5 +3,9 @@
 from .flight_price import predict
 
 
-if __name__ == '__main__':
+def main():
     predict()
+
+
+if __name__ == '__main__':
+    main()
