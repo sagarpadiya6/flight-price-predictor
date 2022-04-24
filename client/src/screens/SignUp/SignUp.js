@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
@@ -10,6 +11,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import { useTheme } from "@mui/material/styles";
 
@@ -19,6 +21,7 @@ export default function SignUp() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const [userEmail, setUserEmail] = useState("");
 
   const {
     register,
@@ -36,8 +39,21 @@ export default function SignUp() {
     password,
     repeatPassword,
   }) => {
+    console.log({
+      name,
+      username,
+      email,
+      password,
+      repeatPassword,
+    });
+    setUserEmail(email);
     await mutateAsync({ name, username, email, password, repeatPassword });
   };
+
+  console.log("isLoading - : ", isLoading);
+  console.log("error - : ", error);
+  console.log("isError - : ", isError);
+  console.log("Data - : ", data);
 
   const theme = useTheme();
   const paperStyle = {
@@ -47,7 +63,13 @@ export default function SignUp() {
   const avatarStyle = {
     backgroundColor: theme.palette.primary.main,
   };
-  console.log("Data: ", data);
+
+  useEffect(() => {
+    if (data?.id) {
+      navigate("/login", { state: { from, userCreated: true, userEmail } });
+    }
+  }, [data]);
+
   return (
     <Container component="main" maxWidth="sm">
       <Paper elevation={10} style={paperStyle}>
@@ -61,6 +83,7 @@ export default function SignUp() {
         </Grid>
         <Grid sx={{ height: "100%", justifyContent: "center" }}>
           <form onSubmit={handleSubmit(onSubmit)}>
+            {isError && <Alert severity="error">{error}</Alert>}
             <Box mt={5}>
               <TextField
                 id="name"
@@ -187,7 +210,7 @@ export default function SignUp() {
                 type="password"
                 fullWidth
                 required
-                {...register("repeat_password", {
+                {...register("repeatPassword", {
                   required: "Password is required",
                   minLength: {
                     value: 8,
@@ -203,20 +226,20 @@ export default function SignUp() {
                       "Password must contain only letters, numbers and any of !,#,@,$ characters",
                   },
                 })}
-                error={!!errors?.password}
-                helperText={errors?.password?.message}
+                error={!!errors?.repeatPassword}
+                helperText={errors?.repeatPassword?.message}
                 autoComplete="new-password"
                 disabled={isLoading}
               />
             </Box>
             <Box mt={4}>
               <Button
+                isLoading={isLoading}
                 type="submit"
                 variant="contained"
                 size="large"
                 color="primary"
                 fullWidth
-                disabled={isLoading}
               >
                 <Typography variant="h6">Sign Up</Typography>
               </Button>

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useMutation } from "react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -6,26 +8,44 @@ import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useTheme } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import Container from "@mui/material/Container";
 import useAuth from "../../hooks/useAuth";
+import { loginUser } from "../../api";
 
 export default function SignIn({ redirectFromSignUp = false }) {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const [showConfirmEmail, setShowConfirmEmail] = useState(
+    location.state?.userCreated && location.state?.userEmail
+  );
+
+  console.log("location - : ", location, showConfirmEmail);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
+  const { isLoading, error, isError, data, mutateAsync } = useMutation(
+    "login",
+    loginUser
+  );
+  const onSubmit = async ({ emailOrUsername, password }) => {
+    console.log({ emailOrUsername, password });
+    setShowConfirmEmail(false);
+    await mutateAsync({ emailOrUsername, password });
   };
+
+  console.log("isLoading - : ", isLoading);
+  console.log("error - : ", error);
+  console.log("isError - : ", isError);
+  console.log("Data - : ", data);
 
   const theme = useTheme();
   const paperStyle = {
@@ -49,6 +69,19 @@ export default function SignIn({ redirectFromSignUp = false }) {
         </Grid>
         <Grid sx={{ height: "100%", justifyContent: "center" }}>
           <form onSubmit={handleSubmit(onSubmit)}>
+            {showConfirmEmail && (
+              <Box mt={2}>
+                <Alert severity="success">
+                  Please confirm your email sent to{" "}
+                  <b>{location.state?.userEmail}</b>
+                </Alert>
+              </Box>
+            )}
+            {isError && (
+              <Box mt={2}>
+                <Alert severity="error">{error.message}</Alert>
+              </Box>
+            )}
             <Box mt={5}>
               <TextField
                 id="username"
@@ -57,7 +90,7 @@ export default function SignIn({ redirectFromSignUp = false }) {
                 variant="outlined"
                 fullWidth
                 required
-                {...register("username", {
+                {...register("emailOrUsername", {
                   required: "Username / Email is required",
                   minLength: {
                     value: 6,
@@ -68,10 +101,11 @@ export default function SignIn({ redirectFromSignUp = false }) {
                     message: "Username / Email must be at most 100 characters",
                   },
                 })}
-                error={!!errors?.username}
-                helperText={errors?.username?.message}
+                error={!!errors?.emailOrUsername}
+                helperText={errors?.emailOrUsername?.message}
                 autoFocus
                 autoComplete="email"
+                disabled={isLoading}
               />
             </Box>
             <Box mt={2}>
@@ -102,10 +136,12 @@ export default function SignIn({ redirectFromSignUp = false }) {
                 error={!!errors?.password}
                 helperText={errors?.password?.message}
                 autoComplete="current-password"
+                disabled={isLoading}
               />
             </Box>
             <Box mt={4}>
               <Button
+                isLoading={isLoading}
                 type="submit"
                 variant="contained"
                 size="large"

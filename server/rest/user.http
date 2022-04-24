@@ -7,10 +7,10 @@ content-type: application/json
 
 {
   "name": "Sagar Padiya",
-  "username": "sagarpadiya",
+  "username": "sagarpadiya1",
   "email": "vignesh6993@live.in",
   "password": "Sagar#123",
-  "repeat_password": "Sagar#123"
+  "repeatPassword": "Sagar#123"
 }
 
 ###
@@ -40,7 +40,7 @@ POST http://{{host}}/api/v1/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "emailOrUsername": "sagarpadiya",
+  "emailOrUsername": "sagarpadiya1",
   "password": "Sagar#123"
 }
 
