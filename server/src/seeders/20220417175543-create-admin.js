@@ -11,7 +11,8 @@ module.exports = {
           name: 'Sagar Padiya',
           username: 'sagarpadiya',
           email: 'sagarpadiya7000@gmail.com',
-          password: 'Sagar#123',
+          password:
+            '$2b$10$OThgRwy40u6X0PN.EDfHxe6CNdRMjMrBxWh0FWPJZriFZVE5c/JNS',
           confirmed: true,
           role: 'admin',
           createdAt: new Date(),
