@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM1Y2RmY2Y5LWM3YWQtNDJlMi1iNDAyLTM4NmVmNzk2MzFlOSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjUwNTc0MzI0LCJleHAiOjE2NTA1NzQ2MjR9.EfWSoHtfHnzEd_rfmXcXmCihtGSEifaITXsFNZsfw50
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEyYWU0OWExLWE4MTktNDZiNy05NTY5LTlkOTU4NGFmYWI1MCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjUwODI2Njk4LCJleHAiOjE2NTA4MjY5OTh9.nnjNwOgMflpl4A9aK7ZIxqHSJEHwm2Upt2WvWpeU3Ik
 @host = localhost:4005
 
 // Submit a user review
@@ -34,4 +34,8 @@ Authorization: Bearer {{token}}
 
 ###
 
+// Get all user reviews
+GET http://{{host}}/api/v1/review HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
 

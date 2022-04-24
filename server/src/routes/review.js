@@ -41,7 +41,7 @@ router.post('/', verifyToken, async (req, res) => {
     return res.status(200).json({ review: userReview });
   } catch (err) {
     console.log(err);
-    return res.status(500).json(err);
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
   }
 });
 
@@ -76,7 +76,7 @@ router.put('/', verifyToken, async (req, res) => {
     return res.status(200).json({ review: userReview });
   } catch (err) {
     console.log(err);
-    return res.status(500).json(err);
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
   }
 });
 
@@ -106,7 +106,22 @@ router.delete('/', verifyToken, async (req, res) => {
     return res.status(200).json({ review: userReview });
   } catch (err) {
     console.log(err);
-    return res.status(500).json(err);
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
+  }
+});
+
+router.get('/', verifyToken, async (req, res) => {
+  const { userUuid: loggedInUser } = req;
+  try {
+    const dbUser = await User.findOne({ where: { uuid: loggedInUser.id } });
+    if (!dbUser) {
+      return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
+    }
+    const allReviews = await Review.findAll();
+    return res.status(200).json({ reviews: allReviews });
+  } catch (err) {
+    console.log(err);
+    return errorMsg(res, 500, ERROR_CODE.ERR_SOMETHING_WENT_WRONG, err);
   }
 });
 
