@@ -1,15 +1,15 @@
-@token = token
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM1Y2RmY2Y5LWM3YWQtNDJlMi1iNDAyLTM4NmVmNzk2MzFlOSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjUwNTc0MzI0LCJleHAiOjE2NTA1NzQ2MjR9.EfWSoHtfHnzEd_rfmXcXmCihtGSEifaITXsFNZsfw50
 @host = localhost:4005
 
 // Submit a user review
 POST http://{{host}}/api/v1/review HTTP/1.1
 content-type: application/json
-auth-token: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "review": "First review",
   "star": "1",
-  "recommendation" :"down"
+  "recommendation": false
 }
 
 ###
@@ -17,12 +17,12 @@ auth-token: {{token}}
 // Edit a user review
 PUT http://{{host}}/api/v1/review HTTP/1.1
 content-type: application/json
-auth-token: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "review": "Second Review",
   "star": "5",
-  "recommendation" :"up"
+  "recommendation": true
 }
 
 ###
@@ -30,7 +30,7 @@ auth-token: {{token}}
 // Delete a user review
 DELETE http://{{host}}/api/v1/review HTTP/1.1
 content-type: application/json
-auth-token: {{token}}
+Authorization: Bearer {{token}}
 
 ###
 

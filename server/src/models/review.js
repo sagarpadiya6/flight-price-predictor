@@ -36,6 +36,10 @@ const reviewModel = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(User, { foreignKey: 'userId', as: 'user' });
     }
+
+    toJSON() {
+      return { ...this.get(), id: undefined, userId: undefined };
+    }
   }
   Review.init(
     {
@@ -66,6 +70,10 @@ const reviewModel = (sequelize, DataTypes) => {
           notNull: { msg: 'Recommendation cannot be null' },
           notEmpty: { msg: 'Recommendation cannot be empty' },
         },
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
     },
     {

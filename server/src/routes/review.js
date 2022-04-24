@@ -23,19 +23,19 @@ const router = express.Router();
  *         description: User review submitted successfully
  */
 router.post('/', verifyToken, async (req, res) => {
-  const { userUuid: uuid } = req;
+  const { userUuid: loggedInUser } = req;
   const { review, star, recommendation } = req.body;
 
   try {
-    const user = await User.findOne({ where: { uuid } });
-    if (!user) {
+    const dbUser = await User.findOne({ where: { uuid: loggedInUser.id } });
+    if (!dbUser) {
       return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
     }
     const userReview = await Review.create({
+      userId: dbUser.id,
       star,
       review,
       recommendation,
-      userId: user.id,
     });
 
     return res.status(200).json({ review: userReview });
@@ -56,15 +56,15 @@ router.post('/', verifyToken, async (req, res) => {
  *         description: User review edited successfully
  */
 router.put('/', verifyToken, async (req, res) => {
-  const { userUuid: uuid } = req;
+  const { userUuid: loggedInUser } = req;
   const { review, star, recommendation } = req.body;
 
   try {
-    const user = await User.findOne({ where: { uuid } });
-    if (!user) {
+    const dbUser = await User.findOne({ where: { uuid: loggedInUser.id } });
+    if (!dbUser) {
       return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
     }
-    const userReview = await Review.findOne({ where: { userId: user.id } });
+    const userReview = await Review.findOne({ where: { userId: dbUser.id } });
     if (!userReview) {
       return errorMsg(res, 400, ERROR_CODE.ERR_USER_REVIEW_NOT_FOUND);
     }
@@ -91,13 +91,13 @@ router.put('/', verifyToken, async (req, res) => {
  *         description: User review submitted successfully
  */
 router.delete('/', verifyToken, async (req, res) => {
-  const { userUuid: uuid } = req;
+  const { userUuid: loggedInUser } = req;
   try {
-    const user = await User.findOne({ where: { uuid } });
-    if (!user) {
+    const dbUser = await User.findOne({ where: { uuid: loggedInUser.id } });
+    if (!dbUser) {
       return errorMsg(res, 400, ERROR_CODE.ERR_USER_NOT_FOUND);
     }
-    const userReview = await Review.findOne({ where: { userId: user.id } });
+    const userReview = await Review.findOne({ where: { userId: dbUser.id } });
     if (!userReview) {
       return errorMsg(res, 400, ERROR_CODE.ERR_USER_REVIEW_NOT_FOUND);
     }
