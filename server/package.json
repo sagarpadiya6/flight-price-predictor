@@ -44,6 +44,7 @@
     "debug": "^2.6.9",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "helmet": "^5.0.2",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
