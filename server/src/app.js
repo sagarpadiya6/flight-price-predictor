@@ -3,6 +3,7 @@ import http from 'http';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
 import logger from 'morgan';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -23,6 +24,7 @@ app.use(
     origin: 'http://localhost:3000',
   })
 );
+app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
