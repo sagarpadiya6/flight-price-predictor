@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -20,6 +20,8 @@ export default function SignIn({ redirectFromSignUp = false }) {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const confirmed = searchParams.get("confirmed");
   const from = location.state?.from?.pathname || "/";
   const [showConfirmEmail, setShowConfirmEmail] = useState(
     location.state?.userCreated && location.state?.userEmail
@@ -91,6 +93,13 @@ export default function SignIn({ redirectFromSignUp = false }) {
             {isError && (
               <Box mt={2}>
                 <Alert severity="error">{error.message}</Alert>
+              </Box>
+            )}
+            {confirmed && (
+              <Box mt={2}>
+                <Alert severity="success">
+                  Your account has been successfully confirmed. Please sign in.
+                </Alert>
               </Box>
             )}
             <Box mt={5}>

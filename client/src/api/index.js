@@ -105,3 +105,39 @@ export const getPricing = async ({
     throw Error(error.response.data.message);
   }
 };
+
+export const postReview = async ({ star, review, recommendation, token }) => {
+  try {
+    const { data } = await api.post(
+      "/review",
+      JSON.stringify({ star, review, recommendation }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw Error(error.response.data.message);
+  }
+};
+
+export const getAllReviews = async ({ token }) => {
+  try {
+    const { data } = await api.get("/review", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw Error(error.response.data.message);
+  }
+};

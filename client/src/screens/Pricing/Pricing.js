@@ -14,6 +14,7 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import { useTheme } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
+import Alert from "@mui/material/Alert";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import useAuth from "../../hooks/useAuth";
 import ReactHookFormSelect from "../../components/ReactHookFormSelect";
@@ -84,6 +85,12 @@ const Pricing = () => {
             <Grid mt={2}>
               <hr />
             </Grid>
+
+            {isError && (
+              <Box mt={2}>
+                <Alert severity="error">{error.message}</Alert>
+              </Box>
+            )}
             <Grid
               container
               spacing={2}
