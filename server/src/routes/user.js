@@ -82,18 +82,24 @@ router.post('/register', validateBody(registerValidation), async (req, res) => {
       { id: savedUser.uuid },
       process.env.EMAIL_SECRET,
       { expiresIn: tokenExpiration.EMAIL_TOKEN_EXPIRATION },
-      (_err, emailToken) => {
+      async (_err, emailToken) => {
         const url = `http://localhost:${process.env['PORT']}/api/v1/user/confirmation/${emailToken}`;
-        var content = fs.readFileSync(
-          path.resolve(__dirname, '../templates/confirmEmail.njk'),
-          'utf8'
-        );
-        nunjucks.configure({ autoescape: true });
-        transporter.sendMail({
-          to: savedUser.email,
-          subject: 'Confirm email',
-          html: nunjucks.renderString(content, { name: req.body.name, url }),
-        });
+        try {
+          var content = fs.readFileSync(
+            path.resolve(__dirname, '../templates/confirmEmail.njk'),
+            'utf8'
+          );
+          nunjucks.configure({ autoescape: true });
+          await transporter.sendMail({
+            to: savedUser.email,
+            subject: 'Confirm email',
+            html: nunjucks.renderString(content, { name: req.body.name, url }),
+          });
+        } catch (err2) {
+          if (err2) {
+            console.log(err2);
+          }
+        }
       }
     );
 
@@ -136,18 +142,25 @@ router.post('/resend-email', async (req, res) => {
       { id: user.uuid },
       process.env.EMAIL_SECRET,
       { expiresIn: tokenExpiration.EMAIL_TOKEN_EXPIRATION },
-      (_err, emailToken) => {
+      async (err, emailToken) => {
         const url = `http://localhost:${process.env['PORT']}/api/v1/user/confirmation/${emailToken}`;
-        var content = fs.readFileSync(
-          path.resolve(__dirname, '../templates/confirmEmail.njk'),
-          'utf8'
-        );
-        nunjucks.configure({ autoescape: true });
-        transporter.sendMail({
-          to: savedUser.email,
-          subject: 'Confirm email',
-          html: nunjucks.renderString(content, { name: req.body.name, url }),
-        });
+
+        try {
+          var content = fs.readFileSync(
+            path.resolve(__dirname, '../templates/confirmEmail.njk'),
+            'utf8'
+          );
+          nunjucks.configure({ autoescape: true });
+          await transporter.sendMail({
+            to: user.email,
+            subject: 'Confirm email',
+            html: nunjucks.renderString(content, { name: req.body.name, url }),
+          });
+        } catch (err2) {
+          if (err2) {
+            console.log(err2);
+          }
+        }
       }
     );
 
