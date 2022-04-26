@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import { useForm, Controller } from "react-hook-form";
 import Paper from "@mui/material/Paper";
@@ -9,27 +11,27 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import { useTheme } from "@mui/material/styles";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import ToggleButton from "@mui/material/ToggleButton";
 import Alert from "@mui/material/Alert";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import Stack from "@mui/material/Stack";
-import useAuth from "../../hooks/useAuth";
-import { postReview, getAllReviews } from "../../api";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { postReview, getAllReviews } from "../../api/review";
 
 const Pricing = () => {
-  const { auth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const axios = useAxiosPrivate();
   const { isLoading, error, isError, data, mutateAsync } = useMutation(
     "postReview",
-    postReview
+    postReview(axios)
   );
 
-  const reviewsQuery = useQuery("getAllReviews", () =>
-    getAllReviews({ token: auth.token })
-  );
+  const reviewsQuery = useQuery("getAllReviews", getAllReviews(axios));
 
   const {
     register,
@@ -39,16 +41,10 @@ const Pricing = () => {
   } = useForm();
 
   const onSubmit = async ({ star, review, recommendation }) => {
-    console.log({
-      star,
-      review,
-      recommendation,
-    });
     await mutateAsync({
       star,
       review,
       recommendation,
-      token: auth.token,
     });
   };
 
@@ -60,6 +56,12 @@ const Pricing = () => {
   const avatarStyle = {
     backgroundColor: theme.palette.primary.main,
   };
+
+  useEffect(() => {
+    if (isError || reviewsQuery.isError) {
+      navigate("/login", { state: { from: location }, replace: true });
+    }
+  }, [isError, reviewsQuery.isError, navigate, location]);
 
   return (
     <Container component="main" maxWidth="md">
@@ -176,7 +178,7 @@ const Pricing = () => {
 
             <Grid item xs={12}>
               <Box mt={4}>
-                <Button
+                <LoadingButton
                   loading={Boolean(isLoading)}
                   type="submit"
                   variant="contained"
@@ -185,7 +187,7 @@ const Pricing = () => {
                   fullWidth
                 >
                   <Typography variant="h6">Submit Review</Typography>
-                </Button>
+                </LoadingButton>
               </Box>
             </Grid>
           </Grid>

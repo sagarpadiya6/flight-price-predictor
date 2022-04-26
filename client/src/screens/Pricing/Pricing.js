@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "react-query";
 import Paper from "@mui/material/Paper";
@@ -16,12 +17,12 @@ import { useTheme } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import useAuth from "../../hooks/useAuth";
 import ReactHookFormSelect from "../../components/ReactHookFormSelect";
-import { getPricing } from "../../api";
+import { getPricing } from "../../api/pricing";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Pricing = () => {
-  const { auth } = useAuth();
+  const axios = useAxiosPrivate();
   const {
     register,
     handleSubmit,
@@ -31,8 +32,11 @@ const Pricing = () => {
 
   const { isLoading, error, isError, data, mutateAsync } = useMutation(
     "getPricing",
-    getPricing
+    getPricing(axios)
   );
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const onSubmit = async ({
     depDateTime,
@@ -49,7 +53,6 @@ const Pricing = () => {
       airline,
       source,
       destination,
-      token: auth.token,
     });
   };
 
@@ -63,8 +66,10 @@ const Pricing = () => {
   };
 
   useEffect(() => {
-    console.log("Price - : ", data);
-  }, [data]);
+    if (isError) {
+      navigate("/login", { state: { from: location }, replace: true });
+    }
+  }, [isError, navigate, location]);
 
   return (
     <Container component="main" maxWidth="md">

@@ -14,8 +14,8 @@ import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import { useTheme } from "@mui/material/styles";
-
-import { signUpUser } from "../../api";
+import { signUpUser } from "../../api/user";
+import { api } from "../../api";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function SignUp() {
   } = useForm();
   const { isLoading, error, isError, data, mutateAsync } = useMutation(
     "signup",
-    signUpUser
+    signUpUser(api)
   );
   const onSubmit = async ({
     name,
@@ -39,21 +39,9 @@ export default function SignUp() {
     password,
     repeatPassword,
   }) => {
-    console.log({
-      name,
-      username,
-      email,
-      password,
-      repeatPassword,
-    });
     setUserEmail(email);
     await mutateAsync({ name, username, email, password, repeatPassword });
   };
-
-  console.log("isLoading - : ", isLoading);
-  console.log("error - : ", error);
-  console.log("isError - : ", isError);
-  console.log("Data - : ", data);
 
   const theme = useTheme();
   const paperStyle = {
@@ -83,7 +71,11 @@ export default function SignUp() {
         </Grid>
         <Grid sx={{ height: "100%", justifyContent: "center" }}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {isError && <Alert severity="error">{error}</Alert>}
+            {isError && (
+              <Box mt={2}>
+                <Alert severity="error">{error?.message}</Alert>
+              </Box>
+            )}
             <Box mt={5}>
               <TextField
                 id="name"
@@ -234,7 +226,7 @@ export default function SignUp() {
             </Box>
             <Box mt={4}>
               <LoadingButton
-                isLoading={Boolean(isLoading)}
+                loading={Boolean(isLoading)}
                 type="submit"
                 variant="contained"
                 size="large"

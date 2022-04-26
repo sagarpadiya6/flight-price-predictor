@@ -19,11 +19,13 @@ import { useTheme } from "@mui/material/styles";
 import { ColorModeContext } from "../../ToggleColorMode";
 import { NavLink as Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { logOutUser } from "../../api";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { logOutUser } from "../../api/user";
 
 const settings = ["Account", "Logout"];
 
 const ResponsiveAppBar = () => {
+  const axios = useAxiosPrivate();
   const [pages, setPages] = useState([
     {
       name: "Pricing",
@@ -54,7 +56,7 @@ const ResponsiveAppBar = () => {
     const { menu } = event.currentTarget.dataset;
     switch (menu) {
       case "Logout":
-        logOutUser(auth?.token);
+        logOutUser(axios)();
         setAuth(null);
         navigate("/login", { replace: true });
         break;

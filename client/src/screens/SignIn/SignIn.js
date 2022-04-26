@@ -13,8 +13,10 @@ import Alert from "@mui/material/Alert";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useTheme } from "@mui/material/styles";
 import Container from "@mui/material/Container";
+// import Link from "@mui/material/Link";
 import useAuth from "../../hooks/useAuth";
-import { loginUser } from "../../api";
+import { loginUser } from "../../api/user";
+import { api } from "../../api";
 
 export default function SignIn({ redirectFromSignUp = false }) {
   const { setAuth } = useAuth();
@@ -27,27 +29,20 @@ export default function SignIn({ redirectFromSignUp = false }) {
     location.state?.userCreated && location.state?.userEmail
   );
 
-  console.log("location - : ", location, showConfirmEmail);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const { isLoading, error, isError, data, mutateAsync } = useMutation(
-    "login",
-    loginUser
+    "loginUser",
+    loginUser(api)
   );
+
   const onSubmit = async ({ emailOrUsername, password }) => {
-    console.log({ emailOrUsername, password });
     setShowConfirmEmail(false);
     await mutateAsync({ emailOrUsername, password });
   };
-
-  console.log("isLoading - : ", isLoading);
-  console.log("error - : ", error);
-  console.log("isError - : ", isError);
-  console.log("Data - : ", data);
 
   const theme = useTheme();
   const paperStyle = {
@@ -87,6 +82,7 @@ export default function SignIn({ redirectFromSignUp = false }) {
                 <Alert severity="success">
                   Please confirm your email sent to{" "}
                   <b>{location.state?.userEmail}</b>
+                  {/* <Link href="#">Click here</Link> to resend. */}
                 </Alert>
               </Box>
             )}
