@@ -7,6 +7,9 @@ const useRefreshToken = () => {
   const refresh = async () => {
     try {
       const { data } = await api.get("/user/refresh", {
+        headers: {
+          "Content-Type": "application/json",
+        },
         withCredentials: true,
       });
       setAuth((prev) => {
