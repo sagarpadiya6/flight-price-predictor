@@ -13,7 +13,7 @@ import {
   deleteValidation,
 } from '../validations/user';
 import transporter from '../utils/transporter';
-import { errorMsg, ERROR_CODE, ROLE } from '../constants';
+import { errorMsg, ERROR_CODE, ROLE, tokenExpiration } from '../constants';
 import authRole from '../auth/authRole';
 
 // TODO: Store and send roles as an array
@@ -81,7 +81,7 @@ router.post('/register', validateBody(registerValidation), async (req, res) => {
     jwt.sign(
       { id: savedUser.uuid },
       process.env.EMAIL_SECRET,
-      { expiresIn: '1d' },
+      { expiresIn: tokenExpiration.EMAIL_TOKEN_EXPIRATION },
       (_err, emailToken) => {
         const url = `http://localhost:${process.env['PORT']}/api/v1/user/confirmation/${emailToken}`;
         var content = fs.readFileSync(
@@ -135,7 +135,7 @@ router.post('/resend-email', async (req, res) => {
     jwt.sign(
       { id: user.uuid },
       process.env.EMAIL_SECRET,
-      { expiresIn: '1d' },
+      { expiresIn: tokenExpiration.EMAIL_TOKEN_EXPIRATION },
       (_err, emailToken) => {
         const url = `http://localhost:${process.env['PORT']}/api/v1/user/confirmation/${emailToken}`;
         var content = fs.readFileSync(
@@ -196,19 +196,19 @@ router.post('/login', validateBody(loginValidation), async (req, res) => {
     { id: user.uuid, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: '5m',
+      expiresIn: tokenExpiration.ACCESS_TOKEN_EXPIRATION,
     }
   );
   const refreshToken = jwt.sign(
     { id: user.uuid, role: user.role },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: '7d',
+      expiresIn: tokenExpiration.REFRESH_TOKEN_EXPIRATION,
     }
   );
 
   return res
-    .header('Authorization', accessToken)
+    .header('Authorization', `Bearer ${accessToken}`)
     .cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -227,7 +227,7 @@ router.get('/logout', verifyToken, (req, res) => {
   }
 });
 
-router.get('/refresh-token', async (req, res) => {
+router.get('/refresh', async (req, res) => {
   try {
     const currentRefreshToken = req.cookies.refresh_token;
     if (!currentRefreshToken) {
@@ -252,19 +252,19 @@ router.get('/refresh-token', async (req, res) => {
       { id: user.uuid, role: user.role },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: '5m',
+        expiresIn: tokenExpiration.ACCESS_TOKEN_EXPIRATION,
       }
     );
     const refreshToken = jwt.sign(
       { id: user.uuid, role: user.role },
       process.env.REFRESH_TOKEN_SECRET,
       {
-        expiresIn: '7d',
+        expiresIn: tokenExpiration.REFRESH_TOKEN_EXPIRATION,
       }
     );
 
     return res
-      .header('Authorization', accessToken)
+      .header('Authorization', `Bearer ${accessToken}`)
       .cookie('refresh_token', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

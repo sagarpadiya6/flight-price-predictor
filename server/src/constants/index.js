@@ -3,6 +3,12 @@ export const ROLE = {
   USER: 'user',
 };
 
+export const tokenExpiration = {
+  ACCESS_TOKEN_EXPIRATION: '15s',
+  REFRESH_TOKEN_EXPIRATION: '7d',
+  EMAIL_TOKEN_EXPIRATION: '1d',
+};
+
 export const ERROR_CODE = {
   // General error codes
   ERR_SOMETHING_WENT_WRONG: 'ERR_SOMETHING_WENT_WRONG',

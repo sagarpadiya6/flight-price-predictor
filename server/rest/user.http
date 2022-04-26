@@ -80,8 +80,7 @@ Authorization: Bearer {{token}}
 
 ###
 
-GET http://{{host}}/api/v1/user/refresh-token HTTP/1.1
+GET http://{{host}}/api/v1/user/refresh HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
 
 ###
