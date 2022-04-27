@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import logger from 'morgan';
@@ -24,6 +25,7 @@ app.use(
     origin: 'http://localhost:3000',
   })
 );
+app.use(compression());
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
