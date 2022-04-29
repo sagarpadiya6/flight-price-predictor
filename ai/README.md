@@ -28,8 +28,15 @@ This is a cli tool which predicts fare of Indian flight ticket.
 The Code is written in `Python 3.9.12`. If you don't have Python installed you can find it [here](https://www.python.org/downloads/).
 
 ```bash
-pip3 install numpy pandas matplotlib seaborn sklearn openpyxl
+pip3 install numpy pandas matplotlib seaborn sklearn openpyxl click
 ```
+
+To test the working
+
+```bash
+python3 flight_price/flight_price.py --dep_date_time='2022-07-12T19:30' --arr_date_time='2022-07-12T20:30' --stops=0 --airline='IndiGo' --source='Chennai' --destination='Delhi'
+```
+
 
 ## Directory Tree
 

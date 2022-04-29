@@ -13,7 +13,7 @@ module.exports = {
         defaultValue: DataTypes.UUIDV4,
       },
       star: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       review: {

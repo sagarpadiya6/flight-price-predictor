@@ -48,7 +48,7 @@ const reviewModel = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
       },
       star: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: { msg: 'Star rating cannot be null' },

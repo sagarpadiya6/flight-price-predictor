@@ -1,7 +1,7 @@
 import express from 'express';
 import { User, Review } from '../models';
 import verifyToken from '../middlewares/verifyToken';
-import { errorMsg } from '../constants';
+import { errorMsg, ERROR_CODE  } from '../constants';
 
 /**
  * @swagger
@@ -33,7 +33,7 @@ router.post('/', verifyToken, async (req, res) => {
     }
     const userReview = await Review.create({
       userId: dbUser.id,
-      star,
+      star: String(star),
       review,
       recommendation,
     });
