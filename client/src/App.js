@@ -4,6 +4,7 @@ import Reviews from "./screens/Reviews";
 import Pricing from "./screens/Pricing";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
+import Booking from "./screens/Booking";
 import NoMatch from "./screens/NoMatch";
 import UnAuthorized from "./screens/UnAuthorized";
 import Admin from "./screens/Admin";
@@ -18,6 +19,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="login" element={<SignIn />} />
         <Route exact path="signup" element={<SignUp />} />
+        <Route exact path="booking" element={<Booking />} />
         <Route exact path="unauthorized" element={<UnAuthorized />} />
 
         {/* private routes */}

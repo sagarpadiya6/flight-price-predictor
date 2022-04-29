@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, NavLink as Link } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "react-query";
 import Paper from "@mui/material/Paper";
@@ -15,6 +15,7 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import { useTheme } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ReactHookFormSelect from "../../components/ReactHookFormSelect";
@@ -297,6 +298,25 @@ const Pricing = () => {
                       {" "}
                       Estimated Fare is: {data?.price}
                     </Typography>
+
+                    <Button
+                      component={Link}
+                      to="/reviews"
+                      sx={{ mr: 2 }}
+                      variant="contained"
+                      color="secondary"
+                    >
+                      Give Review
+                    </Button>
+                    <Button
+                      component={Link}
+                      to="/booking"
+                      sx={{ mr: 2 }}
+                      variant="contained"
+                      color="secondary"
+                    >
+                      Book Now
+                    </Button>
                   </Box>
                 </Grid>
               )}
