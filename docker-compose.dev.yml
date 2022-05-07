@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: flight-client-dev
+    image: flight-client-dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    build:
+      context: ./client
+      target: base
+    command: yarn start
+    volumes:
+      - ./client/src:/app/src
+    ports:
+      - 3000:3000
+  db:
+    container_name: flight-db-dev
+    restart: always
+    image: postgres:14.2-alpine3.15
+    env_file:
+      - ./server/.env.database
+    environment:
+      - PORT=${POSTGRES_PORT}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes: 
+      - db:/var/lib/postgresql/data
+    depends_on:
+      - app
+    networks:
+      - backend
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}
+      timeout: 10s
+      retries: 20
+  server:
+    container_name: flight-server-dev
+    image: flight-server-dev
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=development
+      - DEV_DB_HOST=db
+    build:
+      context: ./server
+      target: base
+    command: >
+      make start
+    volumes:
+      - ./server/src:/app/src
+    ports:
+      - 4005:4005
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+    tty: true
+    stdin_open: true
+    restart: on-failure
+volumes:
+  db:
+    driver: local
+networks:
+  backend:
+    driver: bridge
