@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -51,12 +52,19 @@ export default function SignUp() {
   const avatarStyle = {
     backgroundColor: theme.palette.primary.main,
   };
+  const onCaptchaChange = (value) => {
+    if (value) {
+      console.log(value);
+    }
+  };
 
   useEffect(() => {
     if (data?.id) {
       navigate("/login", { state: { from, userCreated: true, userEmail } });
     }
   }, [data]);
+
+  console.log(theme.palette.mode);
 
   return (
     <Container component="main" maxWidth="sm">
@@ -224,6 +232,13 @@ export default function SignUp() {
                 disabled={isLoading}
               />
             </Box>
+            <Grid mt={4} align="center">
+              <ReCAPTCHA
+                sitekey="6LfBu9MfAAAAAEP-JFSVa5ry6l29Tzl0j0MdWyh9"
+                theme={theme.palette.mode}
+                onChange={onCaptchaChange}
+              />
+            </Grid>
             <Box mt={4}>
               <LoadingButton
                 loading={Boolean(isLoading)}
