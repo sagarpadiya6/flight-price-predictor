@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import logger from 'morgan';
+// import winston from 'winston';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -17,7 +17,8 @@ import priceRouter from './routes/price';
 
 const app = express();
 
-app.use(logger('dev'));
+// const logger = winston.createLogger({});
+// app.use(logger('dev'));
 app.use(express.json());
 app.use(
   cors({
@@ -36,6 +37,7 @@ app.use('/api/v1/health', indexRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/review', reviewRouter);
 app.use('/api/v1/price', priceRouter);
+
 
 const swaggerOptions = {
   swaggerDefinition: {
