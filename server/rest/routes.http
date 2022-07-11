@@ -1,0 +1,2 @@
+GET https://airlabs.co/api/v9/routes?api_key=1b35798b-d7ca-4cff-806c-b8f68e553783&dep_iata=MAA&dep_icao=VOMM&arr_iata=DEL&arr_icao=VIDP&airline_icao=IGO&airline_iata=6E HTTP/1.1
+content-type: application/json

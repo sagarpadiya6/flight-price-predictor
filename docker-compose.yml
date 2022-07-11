@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  client:
+    container_name: flight-webapp
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+  server:
+    container_name: flight-api
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 4005:4005
+  db:
+    container_name: flight-db
+    image: postgres:14.2-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  ai:
+    container_name: flight-ai
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ./ai:/ai
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - default
+volumes:
+  db-data:

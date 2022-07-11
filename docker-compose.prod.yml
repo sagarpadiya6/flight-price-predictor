@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: flight-client
+    image: flight-client
+    environment:
+      - NODE_ENV=production
+      - PORT=80
+    build:
+      context: ./client
+      target: production
+    volumes:
+      - ./client/src:/app/src
+    ports:
+      - 80:80
